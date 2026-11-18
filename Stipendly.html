@@ -1,0 +1,558 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Stipendly</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Figtree:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap">
+<style>
+/* Layout concept: left-aligned marketplace. Every student card is a stipend slip: profile on top, perforated tear line, monthly figure in mono underneath. */
+:root{
+  --paper:#F1F4F0;
+  --surface:#FFFFFF;
+  --ink:#0F1B1A;
+  --muted:#4F6260;
+  --line:#D3DCD8;
+  --accent:#0B6E64;
+  --accent-ink:#FFFFFF;
+  --accent-soft:#DCEEEA;
+  --sun:#F2B632;
+  --sun-ink:#2A1E00;
+  --good:#1B7F46;
+  --danger:#B3372B;
+  --font-display:'Bricolage Grotesque','Segoe UI',system-ui,sans-serif;
+  --font-body:'Figtree','Segoe UI',system-ui,sans-serif;
+  --font-mono:'DM Mono',ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0B1413;--surface:#13201F;--ink:#E9F1EF;--muted:#9AAFAC;--line:#253836;
+    --accent:#3CC2B0;--accent-ink:#04201C;--accent-soft:#17302D;--sun:#F2B632;--sun-ink:#2A1E00;
+    --good:#4CCB85;--danger:#F07A6C;color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0B1413;--surface:#13201F;--ink:#E9F1EF;--muted:#9AAFAC;--line:#253836;
+  --accent:#3CC2B0;--accent-ink:#04201C;--accent-soft:#17302D;--sun:#F2B632;--sun-ink:#2A1E00;
+  --good:#4CCB85;--danger:#F07A6C;color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{
+  background:var(--paper);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.55;
+  padding-block:0;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+}
+.wrap{max-width:1120px;margin:0 auto}
+h1,h2,h3{font-family:var(--font-display);line-height:1.08;margin:0;text-wrap:balance;letter-spacing:-.02em}
+p{margin:0}
+a{color:inherit}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:4px}
+.label{font-family:var(--font-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+
+/* header */
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-block:18px;flex-wrap:wrap}
+.brand{font-family:var(--font-display);font-weight:800;font-size:24px;letter-spacing:-.03em;text-decoration:none;display:flex;align-items:center;gap:8px}
+.brand i{width:14px;height:14px;border-radius:50%;background:var(--sun);display:inline-block;box-shadow:0 0 0 3px var(--accent-soft)}
+.nav{display:flex;gap:6px;flex-wrap:wrap}
+.nav a{padding:8px 12px;border-radius:8px;text-decoration:none;font-weight:500;font-size:15px;color:var(--muted)}
+.nav a:hover{background:var(--accent-soft);color:var(--ink)}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1.5px solid var(--ink);background:transparent;padding:10px 16px;border-radius:8px;font-weight:600;cursor:pointer;text-decoration:none;font-size:15px;min-height:44px}
+.btn:hover{background:var(--accent-soft)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.small{padding:6px 12px;min-height:36px;font-size:14px}
+.btn.on{background:var(--sun);border-color:var(--sun);color:var(--sun-ink)}
+.btn.ghost{border-color:var(--line)}
+
+/* hero */
+.hero{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:48px;align-items:center;padding-block:48px 64px}
+.hero h1{font-size:clamp(2.4rem,6vw,4.4rem);font-weight:800}
+.hero h1 em{font-style:normal;background:linear-gradient(transparent 62%,var(--sun) 62%,var(--sun) 92%,transparent 92%)}
+.hero p.lead{font-size:1.15rem;color:var(--muted);max-width:52ch;margin-top:20px}
+.hero .cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}
+.hero .note{margin-top:20px}
+.slip{background:var(--surface);border:1.5px solid var(--ink);border-radius:10px;padding:22px;position:relative;transform:rotate(1.6deg);box-shadow:8px 8px 0 var(--accent)}
+.slip .row{display:flex;justify-content:space-between;gap:12px;align-items:baseline;flex-wrap:wrap}
+.slip h3{font-size:1.5rem;margin-top:10px}
+.slip .tear{border-top:2px dashed var(--line);margin:18px -22px 16px;position:relative}
+.slip .tear::before,.slip .tear::after{content:"";position:absolute;top:-11px;width:20px;height:20px;border-radius:50%;background:var(--paper);border:1.5px solid var(--ink)}
+.slip .tear::before{left:-11px;clip-path:inset(0 0 0 50%)}
+.slip .tear::after{right:-11px;clip-path:inset(0 50% 0 0)}
+.amount{font-family:var(--font-mono);font-size:2rem;font-weight:500;letter-spacing:-.03em}
+.amount small{font-size:.9rem;color:var(--muted);font-weight:400}
+.slip .meta{font-family:var(--font-mono);font-size:13px;color:var(--muted);display:flex;gap:14px;flex-wrap:wrap;margin-top:8px}
+
+/* sections */
+section{padding-block:56px;scroll-margin-top:8px}
+.head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:24px}
+.head h2{font-size:clamp(1.8rem,4vw,2.6rem);font-weight:700}
+.head p{color:var(--muted);max-width:56ch;margin-top:8px}
+
+/* filters */
+.filters{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr));align-items:end;margin-bottom:20px}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.field label{font-size:13px;font-weight:600}
+.field input,.field select,.field textarea{background:var(--paper);border:1.5px solid var(--line);border-radius:8px;padding:10px 12px;min-height:44px;width:100%}
+.field textarea{min-height:90px;resize:vertical}
+.field input[type=range]{padding:0;min-height:44px;accent-color:var(--accent);background:transparent;border:0}
+.check{display:flex;align-items:center;gap:10px;min-height:44px;font-weight:500}
+.check input{width:20px;height:20px;accent-color:var(--accent)}
+.count{font-family:var(--font-mono);font-size:13px;color:var(--muted);margin-bottom:14px}
+
+/* student grid */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr));gap:20px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;display:flex;flex-direction:column;min-width:0}
+.card .body{padding:18px 18px 16px;display:flex;flex-direction:column;gap:12px;flex:1}
+.who{display:flex;gap:12px;align-items:center}
+.av{width:46px;height:46px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font-family:var(--font-display);font-weight:700;flex:none}
+.who h3{font-size:1.15rem;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.who .sub{font-size:14px;color:var(--muted)}
+.bio{font-size:15px;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:13px;padding:3px 10px;border-radius:99px;border:1px solid var(--line);background:var(--paper)}
+.chip.field-tag{background:var(--accent-soft);border-color:transparent;color:var(--accent);font-weight:600}
+.you{font-family:var(--font-mono);font-size:11px;background:var(--sun);color:var(--sun-ink);padding:1px 7px;border-radius:4px;letter-spacing:.06em}
+.card .stub{border-top:2px dashed var(--line);padding:14px 18px 16px;display:flex;flex-direction:column;gap:12px}
+.stub .line{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.stub .amount{font-size:1.5rem}
+.avail{font-family:var(--font-mono);font-size:12px;display:flex;gap:6px;align-items:center}
+.avail::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--muted)}
+.avail.now{color:var(--good)}
+.avail.now::before{background:var(--good)}
+.acts{display:flex;gap:8px;flex-wrap:wrap}
+.acts .btn{flex:1 1 120px}
+.empty{border:1.5px dashed var(--line);border-radius:10px;padding:28px;text-align:center;color:var(--muted);grid-column:1/-1}
+
+/* workspace: post role + dashboard */
+.split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px;align-items:start}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:22px;min-width:0}
+.panel h3{font-size:1.35rem;margin-bottom:16px}
+.form{display:grid;gap:14px;grid-template-columns:repeat(2,minmax(0,1fr))}
+.form .wide{grid-column:1/-1}
+.tabs{display:flex;gap:6px;border-bottom:1px solid var(--line);margin-bottom:16px;flex-wrap:wrap}
+.tab{background:none;border:0;border-bottom:3px solid transparent;padding:10px 12px;font-weight:600;color:var(--muted);cursor:pointer;min-height:44px}
+.tab[aria-selected=true]{color:var(--ink);border-bottom-color:var(--accent)}
+.list{display:grid;gap:10px}
+.item{border:1px solid var(--line);border-radius:8px;padding:12px 14px;display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
+.item .t{font-weight:600}
+.item .s{font-size:14px;color:var(--muted)}
+.item .grow{min-width:0;flex:1 1 200px}
+.pill{font-family:var(--font-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:4px;background:var(--accent-soft);color:var(--accent)}
+.fine{font-size:13px;color:var(--muted);margin-top:14px}
+
+/* how it works */
+.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;border-top:1.5px solid var(--ink)}
+.step{padding:22px 24px 8px 0}
+.step+.step{padding-left:24px;border-left:1px solid var(--line)}
+.step .n{font-family:var(--font-mono);color:var(--accent);font-size:14px}
+.step h3{font-size:1.3rem;margin:8px 0}
+.step p{color:var(--muted)}
+
+footer{border-top:1px solid var(--line);padding-block:28px 40px;color:var(--muted);font-size:14px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+
+/* modal + toast */
+.overlay{position:fixed;inset:0;background:rgba(5,14,13,.6);display:grid;place-items:center;padding:16px;z-index:20;overflow:auto}
+.modal{background:var(--surface);border:1.5px solid var(--ink);border-radius:12px;padding:24px;width:min(560px,100%);max-height:100%;overflow:auto}
+.modal h3{font-size:1.5rem;margin-bottom:4px}
+.modal .form{margin-top:16px}
+.toast{position:fixed;left:50%;bottom:max(20px,env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:12px 18px;border-radius:8px;font-weight:500;z-index:30;max-width:calc(100% - 32px)}
+
+@media (max-width:860px){
+  .hero{grid-template-columns:minmax(0,1fr);gap:36px;padding-block:28px 40px}
+  .slip{transform:none;box-shadow:6px 6px 0 var(--accent)}
+  .split{grid-template-columns:minmax(0,1fr)}
+  .steps{grid-template-columns:minmax(0,1fr)}
+  .step,.step+.step{padding:20px 0;border-left:0}
+  .step+.step{border-top:1px solid var(--line)}
+}
+@media (max-width:520px){
+  .form{grid-template-columns:minmax(0,1fr)}
+  section{padding-block:40px}
+}
+@media (prefers-reduced-motion:no-preference){
+  .btn,.card{transition:background .15s,filter .15s,transform .15s}
+  .card:hover{transform:translateY(-2px)}
+}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <a class="brand" href="#top"><i></i>Stipendly</a>
+    <nav class="nav" aria-label="Main">
+      <a href="#browse">Find students</a>
+      <a href="#post">Post a role</a>
+      <a href="#how">How it works</a>
+      <a href="#join">I'm a student</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <div class="hero">
+      <div>
+        <p class="label">Paid student placements</p>
+        <h1>Hire students who are <em>ready to start</em>.</h1>
+        <p class="lead">Post a role with a monthly stipend, browse student profiles by field and availability, and send a hire request in under a minute.</p>
+        <div class="cta">
+          <a class="btn primary" href="#browse">Browse students</a>
+          <a class="btn" href="#post">Post a role</a>
+        </div>
+        <p class="label note">Sample profiles shown. Your roles and requests stay in this browser.</p>
+      </div>
+      <div class="slip" aria-label="Example stipend slip">
+        <div class="row"><span class="label">Stipend slip</span><span class="label">Example</span></div>
+        <h3>Junior data analyst</h3>
+        <p style="color:var(--muted)">Northfield Logistics · 6 months · Hybrid</p>
+        <div class="tear"></div>
+        <div class="amount">$650 <small>/ month</small></div>
+        <div class="meta"><span>20 h/week</span><span>Starts 1 Dec</span><span>Data</span></div>
+      </div>
+    </div>
+
+    <section id="browse">
+      <div class="head">
+        <div>
+          <h2>Find your student</h2>
+          <p>Filter by field, work mode and the monthly stipend you can offer. Shortlist anyone you like, then send a hire request.</p>
+        </div>
+      </div>
+      <div class="filters" role="search">
+        <div class="field"><label for="fq">Search</label><input id="fq" type="search" placeholder="Name, skill or university"></div>
+        <div class="field"><label for="ff">Field</label><select id="ff"></select></div>
+        <div class="field"><label for="fm">Work mode</label>
+          <select id="fm"><option value="">Any</option><option>Remote</option><option>Hybrid</option><option>On-site</option></select></div>
+        <div class="field"><label for="fx">Max stipend: <span id="fxv" style="font-family:var(--font-mono)"></span></label><input id="fx" type="range" min="200" max="1200" step="50" value="1200"></div>
+        <div class="field"><label for="fs">Sort by</label>
+          <select id="fs"><option value="avail">Available soonest</option><option value="low">Stipend, low to high</option><option value="high">Stipend, high to low</option></select></div>
+        <label class="check"><input id="fn" type="checkbox"> Available now</label>
+      </div>
+      <p class="count" id="count" aria-live="polite"></p>
+      <div class="grid" id="grid"></div>
+    </section>
+
+    <section id="post">
+      <div class="head">
+        <div>
+          <h2>Post a role, then manage your hiring</h2>
+          <p>Roles you post appear on the right with a count of students who match the field and your stipend.</p>
+        </div>
+      </div>
+      <div class="split">
+        <form class="panel" id="roleForm">
+          <h3>New role</h3>
+          <div class="form">
+            <div class="field wide"><label for="rt">Role title</label><input id="rt" required placeholder="e.g. Social media assistant"></div>
+            <div class="field"><label for="rf">Field</label><select id="rf"></select></div>
+            <div class="field"><label for="rm">Work mode</label><select id="rm"><option>Remote</option><option>Hybrid</option><option>On-site</option></select></div>
+            <div class="field"><label for="rs">Stipend ($ / month)</label><input id="rs" type="number" min="100" max="5000" step="10" value="500" required></div>
+            <div class="field"><label for="rd">Duration (months)</label><input id="rd" type="number" min="1" max="24" value="3" required></div>
+            <div class="field"><label for="rh">Hours per week</label><input id="rh" type="number" min="4" max="40" value="15" required></div>
+            <div class="field"><label for="rc">Company</label><input id="rc" required placeholder="Your company name"></div>
+            <div class="field wide"><label for="rn">What will they do?</label><textarea id="rn" placeholder="Two or three lines on the work and who they will report to."></textarea></div>
+            <div class="wide"><button class="btn primary" type="submit">Post role</button></div>
+          </div>
+        </form>
+
+        <div class="panel">
+          <h3>Your hiring</h3>
+          <div class="tabs" role="tablist">
+            <button class="tab" role="tab" id="tab-roles" aria-selected="true" data-tab="roles">Open roles <span id="nRoles">0</span></button>
+            <button class="tab" role="tab" id="tab-short" aria-selected="false" data-tab="short">Shortlist <span id="nShort">0</span></button>
+            <button class="tab" role="tab" id="tab-reqs" aria-selected="false" data-tab="reqs">Requests <span id="nReqs">0</span></button>
+          </div>
+          <div class="list" id="dash" role="tabpanel"></div>
+          <p class="fine">Demo mode: requests are saved here and students are not notified yet.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="how">
+      <div class="head"><h2>How it works</h2></div>
+      <div class="steps">
+        <div class="step"><span class="n">Step 1</span><h3>Post the role</h3><p>Set the field, hours and monthly stipend so students know what they are applying to.</p></div>
+        <div class="step"><span class="n">Step 2</span><h3>Pick from profiles</h3><p>Compare skills, availability and expected stipend. Shortlist the ones you want to talk to.</p></div>
+        <div class="step"><span class="n">Step 3</span><h3>Send a hire request</h3><p>Choose a start date, add a short message and send the offer straight from the profile.</p></div>
+      </div>
+    </section>
+
+    <section id="join">
+      <div class="head">
+        <div>
+          <h2>Are you a student?</h2>
+          <p>Add your profile and it shows up in the list above, so recruiters can find you.</p>
+        </div>
+      </div>
+      <form class="panel" id="joinForm">
+        <div class="form">
+          <div class="field"><label for="jn">Full name</label><input id="jn" required></div>
+          <div class="field"><label for="ju">University</label><input id="ju" required></div>
+          <div class="field"><label for="jc">Course and year</label><input id="jc" required placeholder="e.g. BCom Accounting, 2nd year"></div>
+          <div class="field"><label for="jf">Field</label><select id="jf"></select></div>
+          <div class="field wide"><label for="jk">Skills (comma separated)</label><input id="jk" placeholder="Excel, Python, copywriting"></div>
+          <div class="field"><label for="js">Stipend you expect ($ / month)</label><input id="js" type="number" min="100" max="5000" step="10" value="400" required></div>
+          <div class="field"><label for="ja">Availability</label>
+            <select id="ja"><option value="now">Available now</option><option value="1m">From next month</option><option value="3m">In 3 months</option></select></div>
+          <div class="field wide"><label for="jb">Short bio</label><textarea id="jb" placeholder="What you have built or studied, and what role you want."></textarea></div>
+          <div class="wide"><button class="btn primary" type="submit">Add my profile</button></div>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <footer>
+    <span>Stipendly</span>
+    <span>All sample profiles are fictional.</span>
+  </footer>
+</div>
+
+<div class="overlay" id="hireModal" hidden>
+  <form class="modal" id="hireForm" role="dialog" aria-modal="true" aria-labelledby="hireTitle">
+    <p class="label">Hire request</p>
+    <h3 id="hireTitle">Hire</h3>
+    <div class="form">
+      <div class="field wide" id="roleSelWrap" hidden><label for="hr">Use one of your roles</label><select id="hr"></select></div>
+      <div class="field wide"><label for="ht">Role</label><input id="ht" required></div>
+      <div class="field"><label for="ho">Offer ($ / month)</label><input id="ho" type="number" min="100" max="5000" step="10" required></div>
+      <div class="field"><label for="hd">Start date</label><input id="hd" type="date" required></div>
+      <div class="field wide"><label for="hm">Message</label><textarea id="hm" placeholder="Say hello and what the first week looks like."></textarea></div>
+      <div class="wide" style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn primary" type="submit">Send request</button>
+        <button class="btn" type="button" id="hireCancel">Cancel</button>
+      </div>
+    </div>
+  </form>
+</div>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script>
+(function(){
+  var FIELDS=['Design','Software','Data','Marketing','Finance','Writing','Operations'];
+  var SAMPLE=[
+    {id:'s1',name:'Amara Okafor',uni:'Northfield University',course:'BSc Computer Science',year:'3rd year',field:'Software',skills:['React','TypeScript','Figma'],stipend:700,hours:20,modes:['Remote','Hybrid'],avail:'now',bio:'Built a campus bus timetable app used by 1,800 students. Wants a front-end role.'},
+    {id:'s2',name:'Tomás Rivera',uni:'Lakeside College',course:'BA Graphic Design',year:'2nd year',field:'Design',skills:['Illustrator','Branding','Motion'],stipend:450,hours:15,modes:['Remote'],avail:'now',bio:'Designed identities for three student societies. Strong with logos and social templates.'},
+    {id:'s3',name:'Mei Lin Chen',uni:'Eastgate University',course:'BSc Statistics',year:'4th year',field:'Data',skills:['Python','SQL','Tableau'],stipend:800,hours:20,modes:['Hybrid','On-site'],avail:'1m',bio:'Honours project on retail demand forecasting. Comfortable cleaning messy spreadsheets.'},
+    {id:'s4',name:'Zanele Dube',uni:'Highveld University',course:'BCom Marketing',year:'3rd year',field:'Marketing',skills:['Instagram','Canva','Analytics'],stipend:350,hours:12,modes:['Remote','Hybrid'],avail:'now',bio:'Grew a campus food page from 400 to 6,000 followers. Looking for a social media role.'},
+    {id:'s5',name:'Daniel Whitfield',uni:'Northfield University',course:'BCom Accounting',year:'3rd year',field:'Finance',skills:['Excel','Bookkeeping','Xero'],stipend:550,hours:16,modes:['On-site','Hybrid'],avail:'1m',bio:'Treasurer of the investment club. Can reconcile accounts and prepare month-end packs.'},
+    {id:'s6',name:'Priya Nair',uni:'Riverbend College',course:'BA English and Media',year:'2nd year',field:'Writing',skills:['Copywriting','SEO','Editing'],stipend:300,hours:10,modes:['Remote'],avail:'now',bio:'Writes for the student paper. Can turn product notes into clear blog posts and emails.'},
+    {id:'s7',name:'Kofi Mensah',uni:'Eastgate University',course:'BEng Industrial Engineering',year:'4th year',field:'Operations',skills:['Process mapping','Excel','Lean'],stipend:650,hours:20,modes:['On-site'],avail:'3m',bio:'Mapped queue flows at a campus clinic and cut waiting times. Wants a supply chain role.'},
+    {id:'s8',name:'Sofia Marchetti',uni:'Lakeside College',course:'BSc Software Engineering',year:'2nd year',field:'Software',skills:['Python','Django','Git'],stipend:500,hours:15,modes:['Remote'],avail:'now',bio:'Contributes to two open source projects. Looking for a backend internship with mentoring.'},
+    {id:'s9',name:'Lebo Mokoena',uni:'Highveld University',course:'BA Interaction Design',year:'3rd year',field:'Design',skills:['Figma','User research','Prototyping'],stipend:600,hours:18,modes:['Hybrid','Remote'],avail:'1m',bio:'Ran usability tests for a clinic booking app. Strong at turning findings into screens.'},
+    {id:'s10',name:'Arjun Mehta',uni:'Riverbend College',course:'BSc Data Science',year:'3rd year',field:'Data',skills:['R','Power BI','Excel'],stipend:450,hours:14,modes:['Remote','Hybrid'],avail:'now',bio:'Builds dashboards for the sports union. Wants to learn on real business data.'},
+    {id:'s11',name:'Grace Adeyemi',uni:'Northfield University',course:'BCom Finance',year:'4th year',field:'Finance',skills:['Financial modelling','Excel','Reporting'],stipend:900,hours:24,modes:['On-site'],avail:'3m',bio:'Finalist in a university valuation challenge. Looking for an analyst placement.'},
+    {id:'s12',name:'Jonas Becker',uni:'Eastgate University',course:'BA Communication',year:'3rd year',field:'Marketing',skills:['Email campaigns','Events','Copy'],stipend:400,hours:12,modes:['Hybrid','On-site'],avail:'1m',bio:'Organised a 600 person careers fair. Good with partners, schedules and follow-ups.'}
+  ];
+  var AV={now:'Available now','1m':'From next month','3m':'In 3 months'};
+  var AVW={now:0,'1m':1,'3m':2};
+  var KEY='stipendly-v1';
+  var st={roles:[],short:[],reqs:[],mine:[]};
+  try{var raw=localStorage.getItem(KEY);if(raw){var p=JSON.parse(raw);for(var k in st){if(Array.isArray(p[k]))st[k]=p[k];}}}catch(e){}
+  function save(){try{localStorage.setItem(KEY,JSON.stringify(st));}catch(e){}}
+  function all(){return st.mine.concat(SAMPLE);}
+  function byId(id){return all().filter(function(s){return s.id===id;})[0];}
+  function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function $(id){return document.getElementById(id);}
+  function money(n){return '$'+Number(n).toLocaleString('en-US');}
+  function initials(n){return n.split(/\s+/).filter(Boolean).slice(0,2).map(function(w){return w[0].toUpperCase();}).join('');}
+
+  var f={q:'',field:'',mode:'',max:1200,now:false,sort:'avail'};
+  var tab='roles';
+
+  /* populate selects */
+  ['ff','rf','jf'].forEach(function(id){
+    var el=$(id);
+    var html=(id==='ff'?'<option value="">All fields</option>':'')+FIELDS.map(function(x){return '<option>'+x+'</option>';}).join('');
+    el.innerHTML=html;
+  });
+
+  var toastT;
+  function toast(msg){
+    var t=$('toast');t.textContent=msg;t.hidden=false;
+    clearTimeout(toastT);toastT=setTimeout(function(){t.hidden=true;},3200);
+  }
+
+  function filtered(){
+    var q=f.q.trim().toLowerCase();
+    var list=all().filter(function(s){
+      if(f.field&&s.field!==f.field)return false;
+      if(f.mode&&s.modes.indexOf(f.mode)<0)return false;
+      if(s.stipend>f.max)return false;
+      if(f.now&&s.avail!=='now')return false;
+      if(q){
+        var hay=(s.name+' '+s.uni+' '+s.course+' '+s.skills.join(' ')+' '+s.field).toLowerCase();
+        if(hay.indexOf(q)<0)return false;
+      }
+      return true;
+    });
+    list.sort(function(a,b){
+      if(f.sort==='low')return a.stipend-b.stipend;
+      if(f.sort==='high')return b.stipend-a.stipend;
+      return AVW[a.avail]-AVW[b.avail]||a.stipend-b.stipend;
+    });
+    return list;
+  }
+
+  function renderStudents(){
+    $('fxv').textContent=money(f.max);
+    var list=filtered();
+    $('count').textContent=list.length+(list.length===1?' student':' students')+' match your filters';
+    if(!list.length){
+      $('grid').innerHTML='<div class="empty">No students match these filters. Raise the stipend limit or clear the field.</div>';
+      return;
+    }
+    $('grid').innerHTML=list.map(function(s){
+      var shortlisted=st.short.indexOf(s.id)>=0;
+      return '<article class="card">'
+        +'<div class="body">'
+        +'<div class="who"><div class="av" aria-hidden="true">'+esc(initials(s.name))+'</div><div style="min-width:0">'
+        +'<h3>'+esc(s.name)+(s.mine?' <span class="you">YOU</span>':'')+'</h3>'
+        +'<div class="sub">'+esc(s.course)+(s.year?', '+esc(s.year):'')+'<br>'+esc(s.uni)+'</div></div></div>'
+        +(s.bio?'<p class="bio">'+esc(s.bio)+'</p>':'')
+        +'<div class="chips"><span class="chip field-tag">'+esc(s.field)+'</span>'+s.skills.map(function(k){return '<span class="chip">'+esc(k)+'</span>';}).join('')+'</div>'
+        +'</div>'
+        +'<div class="stub">'
+        +'<div class="line"><div class="amount">'+money(s.stipend)+' <small>/ month</small></div><span class="avail '+(s.avail==='now'?'now':'')+'">'+AV[s.avail]+'</span></div>'
+        +'<div class="label">'+s.hours+' h/week · '+esc(s.modes.join(', '))+'</div>'
+        +'<div class="acts"><button class="btn small'+(shortlisted?' on':'')+'" data-act="short" data-id="'+s.id+'" aria-pressed="'+shortlisted+'">'+(shortlisted?'Shortlisted':'Shortlist')+'</button>'
+        +'<button class="btn small primary" data-act="hire" data-id="'+s.id+'">Hire</button></div>'
+        +'</div></article>';
+    }).join('');
+  }
+
+  function matchesFor(r){
+    return all().filter(function(s){return s.field===r.field&&s.stipend<=r.stipend;}).length;
+  }
+
+  function renderDash(){
+    $('nRoles').textContent=st.roles.length;
+    $('nShort').textContent=st.short.length;
+    $('nReqs').textContent=st.reqs.length;
+    ['roles','short','reqs'].forEach(function(t){$('tab-'+t).setAttribute('aria-selected',String(t===tab));});
+    var h='';
+    if(tab==='roles'){
+      h=st.roles.length?st.roles.map(function(r){
+        var n=matchesFor(r);
+        return '<div class="item"><div class="grow"><div class="t">'+esc(r.title)+'</div><div class="s">'+esc(r.company)+' · '+esc(r.field)+' · '+esc(r.mode)+' · '+r.months+' mo · '+r.hours+' h/wk</div>'
+          +'<div class="s" style="font-family:var(--font-mono)">'+money(r.stipend)+' / month · '+n+(n===1?' match':' matches')+'</div></div>'
+          +'<div class="acts"><button class="btn small" data-act="match" data-id="'+r.id+'">Find matches</button><button class="btn small ghost" data-act="delrole" data-id="'+r.id+'" aria-label="Remove role '+esc(r.title)+'">Remove</button></div></div>';
+      }).join(''):'<div class="empty">No roles yet. Fill in the form to post your first one.</div>';
+    }else if(tab==='short'){
+      h=st.short.length?st.short.map(function(id){
+        var s=byId(id);if(!s)return '';
+        return '<div class="item"><div class="grow"><div class="t">'+esc(s.name)+'</div><div class="s">'+esc(s.field)+' · '+esc(s.uni)+'</div><div class="s" style="font-family:var(--font-mono)">'+money(s.stipend)+' / month</div></div>'
+          +'<div class="acts"><button class="btn small primary" data-act="hire" data-id="'+s.id+'">Hire</button><button class="btn small ghost" data-act="short" data-id="'+s.id+'">Remove</button></div></div>';
+      }).join(''):'<div class="empty">Nobody shortlisted yet. Use Shortlist on a student card.</div>';
+    }else{
+      h=st.reqs.length?st.reqs.map(function(q){
+        var s=byId(q.sid);
+        return '<div class="item"><div class="grow"><div class="t">'+esc(s?s.name:'Student')+' · '+esc(q.role)+'</div><div class="s">'+money(q.offer)+' / month · starts '+esc(q.start)+'</div></div>'
+          +'<span class="pill">Sent</span><button class="btn small ghost" data-act="withdraw" data-id="'+q.id+'">Withdraw</button></div>';
+      }).join(''):'<div class="empty">No hire requests yet. Choose Hire on a student to send one.</div>';
+    }
+    $('dash').innerHTML=h;
+  }
+
+  function renderAll(){renderStudents();renderDash();}
+
+  /* filters */
+  $('fq').addEventListener('input',function(e){f.q=e.target.value;renderStudents();});
+  $('ff').addEventListener('change',function(e){f.field=e.target.value;renderStudents();});
+  $('fm').addEventListener('change',function(e){f.mode=e.target.value;renderStudents();});
+  $('fx').addEventListener('input',function(e){f.max=+e.target.value;renderStudents();});
+  $('fs').addEventListener('change',function(e){f.sort=e.target.value;renderStudents();});
+  $('fn').addEventListener('change',function(e){f.now=e.target.checked;renderStudents();});
+
+  /* tabs */
+  document.querySelector('.tabs').addEventListener('click',function(e){
+    var b=e.target.closest('[data-tab]');if(!b)return;
+    tab=b.getAttribute('data-tab');renderDash();
+  });
+
+  /* post role */
+  $('roleForm').addEventListener('submit',function(e){
+    e.preventDefault();
+    var r={id:'r'+Date.now(),title:$('rt').value.trim(),field:$('rf').value,mode:$('rm').value,stipend:+$('rs').value,months:+$('rd').value,hours:+$('rh').value,company:$('rc').value.trim(),notes:$('rn').value.trim()};
+    st.roles.unshift(r);save();tab='roles';renderDash();
+    $('roleForm').reset();$('rs').value=500;$('rd').value=3;$('rh').value=15;
+    toast('Role posted. '+matchesFor(r)+' students match.');
+  });
+
+  /* student profile */
+  $('joinForm').addEventListener('submit',function(e){
+    e.preventDefault();
+    var course=$('jc').value.trim();
+    var s={id:'m'+Date.now(),mine:true,name:$('jn').value.trim(),uni:$('ju').value.trim(),course:course,year:'',field:$('jf').value,
+      skills:$('jk').value.split(',').map(function(x){return x.trim();}).filter(Boolean).slice(0,6),
+      stipend:+$('js').value,hours:15,modes:['Remote','Hybrid','On-site'],avail:$('ja').value,bio:$('jb').value.trim()};
+    st.mine.unshift(s);save();
+    $('joinForm').reset();$('js').value=400;
+    f.q='';f.field='';f.mode='';f.max=1200;f.now=false;
+    $('fq').value='';$('ff').value='';$('fm').value='';$('fx').value=1200;$('fn').checked=false;
+    renderAll();toast('Profile added. It now appears in the list.');
+    $('browse').scrollIntoView({behavior:'smooth'});
+  });
+
+  /* hire modal */
+  var hireFor=null;
+  function openHire(id){
+    var s=byId(id);if(!s)return;
+    hireFor=s;
+    $('hireTitle').textContent='Hire '+s.name;
+    $('ht').value=st.roles.filter(function(r){return r.field===s.field;}).map(function(r){return r.title;})[0]||(s.field+' assistant');
+    $('ho').value=s.stipend;
+    var d=new Date();d.setDate(d.getDate()+(s.avail==='now'?14:s.avail==='1m'?35:95));
+    $('hd').value=d.toISOString().slice(0,10);
+    $('hm').value='Hi '+s.name.split(' ')[0]+', we liked your profile and would like to offer you a paid placement.';
+    var sel=$('hr');
+    if(st.roles.length){
+      sel.innerHTML='<option value="">Choose a role to fill the form</option>'+st.roles.map(function(r){return '<option value="'+r.id+'">'+esc(r.title)+' · '+money(r.stipend)+'</option>';}).join('');
+      $('roleSelWrap').hidden=false;
+    }else{$('roleSelWrap').hidden=true;}
+    $('hireModal').hidden=false;
+    $('ht').focus();
+  }
+  function closeHire(){$('hireModal').hidden=true;hireFor=null;}
+  $('hr').addEventListener('change',function(e){
+    var r=st.roles.filter(function(x){return x.id===e.target.value;})[0];
+    if(r){$('ht').value=r.title;$('ho').value=r.stipend;}
+  });
+  $('hireCancel').addEventListener('click',closeHire);
+  $('hireModal').addEventListener('click',function(e){if(e.target===$('hireModal'))closeHire();});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!$('hireModal').hidden)closeHire();});
+  $('hireForm').addEventListener('submit',function(e){
+    e.preventDefault();
+    if(!hireFor)return;
+    var d=new Date($('hd').value+'T00:00:00');
+    var startLabel=isNaN(d)?$('hd').value:d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+    st.reqs.unshift({id:'q'+Date.now(),sid:hireFor.id,role:$('ht').value.trim(),offer:+$('ho').value,start:startLabel,message:$('hm').value.trim()});
+    save();
+    var nm=hireFor.name;
+    closeHire();tab='reqs';renderDash();
+    toast('Hire request saved for '+nm+'.');
+  });
+
+  /* grid and dashboard actions */
+  function onAct(e){
+    var b=e.target.closest('[data-act]');if(!b)return;
+    var act=b.getAttribute('data-act'),id=b.getAttribute('data-id');
+    if(act==='short'){
+      var i=st.short.indexOf(id);
+      if(i>=0)st.short.splice(i,1);else st.short.push(id);
+      save();renderAll();
+    }else if(act==='hire'){openHire(id);}
+    else if(act==='delrole'){st.roles=st.roles.filter(function(r){return r.id!==id;});save();renderDash();}
+    else if(act==='withdraw'){st.reqs=st.reqs.filter(function(q){return q.id!==id;});save();renderDash();toast('Request withdrawn.');}
+    else if(act==='match'){
+      var r=st.roles.filter(function(x){return x.id===id;})[0];if(!r)return;
+      f.field=r.field;f.max=Math.min(1200,Math.max(200,Math.ceil(r.stipend/50)*50));f.mode='';f.now=false;f.q='';
+      $('ff').value=f.field;$('fx').value=f.max;$('fm').value='';$('fn').checked=false;$('fq').value='';
+      renderStudents();$('browse').scrollIntoView({behavior:'smooth'});
+    }
+  }
+  $('grid').addEventListener('click',onAct);
+  $('dash').addEventListener('click',onAct);
+
+  renderAll();
+})();
+</script>
+
+</body></html>
